@@ -20,15 +20,20 @@
         $_SESSION["error"] = "";
         //Comprobación sobre si ha escrito todos los campos
         if (isset($_POST['email']) && isset($_POST['password'])) {
-            if (file_exists("../../Usuarios/usuarios.json")) {
-                $datos_json = json_decode(file_get_contents("../../Usuarios/usuarios.json"), 1);
+
+            if (true) {
+
                 //Comprobación sobre si el email que se ha escrito existe en el json
-                if (array_key_exists($_POST['email'], $datos_json)) {
+                if (true) {
+
                     //Comprobación sobre si la contraseña es correcta
-                    if ((password_verify($_POST['password'], $datos_json[$_POST['email']]["hashedPasssword"]))) {
-                        $_SESSION["datos_usuario"] = ($datos_json[$_POST['email']]); 
-                        header("location: muestra.php");
-                    }else{
+                    // if (password_verify($_POST['password'])) {
+
+                    //     $_SESSION["datos_usuario"] = ($datos_json[$_POST['email']]); 
+                    //     header("location: muestra.php");
+                    // }
+                    else{
+
                         echo "Algún dato es incorrecto, try again";
                     }
                 }else{
