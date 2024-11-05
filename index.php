@@ -22,7 +22,7 @@
         if (isset($_POST['email']) && isset($_POST['password'])) {
 
             if (true) {
-
+                //Buenas noches
                 //Comprobación sobre si el email que se ha escrito existe en el json
                 if (true) {
 
@@ -32,6 +32,9 @@
                     //     $_SESSION["datos_usuario"] = ($datos_json[$_POST['email']]); 
                     //     header("location: muestra.php");
                     // }
+                    if (true) {
+                        # code...
+                    }
                     else{
 
                         echo "Algún dato es incorrecto, try again";
