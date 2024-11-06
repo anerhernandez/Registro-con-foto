@@ -1,53 +1,46 @@
-<?php 
-    session_start();
-    require("conexion.php");
+<?php
+session_start();
+require("conexion.php");
+require("crud.php");
 ?>
 <html>
-    <head>
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <h1 style="text-align: center;">Página de Inicio de sesión</h1>
-        <form action="<?=$_SERVER['PHP_SELF']?>" method="POST">
-            <input type="email" name="email" id="email" placeholder="Email"><br><br>
-            <input type="password" name="password" id="password" placeholder="Contraseña"><br><br>
-            <input type="submit" name="submit" id="enviar" value="Enviar"><br><br>
-        </form>
-            <p>¿No tienes cuenta?</p>    
-            <a href="registro.php">Registrate aquí</a>
-            <br>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <h1 style="text-align: center;">Página de Inicio de sesión</h1>
+    <form action="<?php $_SERVER['PHP_SELF']?>" method="POST">
+        <input type="email" name="email" id="email" placeholder="Email" required><br><br>
+        <input type="password" name="password" id="password" placeholder="Contraseña" required><br><br>
+        <input type="submit" name="submit" id="enviar" value="Enviar"><br><br>
+    
         <?php
         $_SESSION["error"] = "";
         //Comprobación sobre si ha escrito todos los campos
         if (isset($_POST['email']) && isset($_POST['password'])) {
-
-            if (true) {
-                //Buenas noches
-                //Comprobación sobre si el email que se ha escrito existe en el json
-                if (true) {
-
-                    //Comprobación sobre si la contraseña es correcta
-                    // if (password_verify($_POST['password'])) {
-
-                    //     $_SESSION["datos_usuario"] = ($datos_json[$_POST['email']]); 
-                    //     header("location: muestra.php");
-                    // }
-                    if (true) {
-                        # code...
-                    }
-                    else{
-
-                        echo "Algún dato es incorrecto, try again";
-                    }
-                }else{
-                    echo "No se ha registrado su usuario en esta super pagina chula, regístrese con el botón más arriba";
-                }
+            $stmt = read($conn, $_POST['email']);
+            $resultado = ($stmt->fetch(PDO::FETCH_ASSOC));
+            //Comprobación sobre si el email existe en la DB
+            if ($resultado == false) {
+                $_SESSION["error"] = "No existe un usuario con ese email";
+                //Verificar que la contraseña escrita se verifica con el hash guardado en la DB
+            }elseif (password_verify($_POST['password'], $resultado["PassW"])) {
+                echo "Los datos son correctos yahooo " . print_r($resultado);
             }else{
-                echo "Aún  hay registros de usuario guardados, regístrese para ser el primero";
-            }
-        }else{
+                echo "La contraseña no está bien escrita";
+            } 
+        } else {
             echo "\"Rellene todos los campos para iniciar sesión\"";
         }
         ?>
-    </body>
+    </form>
+    <p>¿No tienes cuenta?</p>
+    <a href="registro.php">Registrate aquí</a>
+    <br>
+
+    
+</body>
+
 </html>

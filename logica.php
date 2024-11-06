@@ -74,7 +74,6 @@ if (
     } else {
         $nombreImagen = "Default.png";
     }
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     // Select para ver si el email que escribió ya existe
     $stmt = read($conn, $email);
     if ($stmt->fetch() != false) {
