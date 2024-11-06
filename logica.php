@@ -2,7 +2,6 @@
 session_start();
 require("conexion.php");
 require("crud.php");
-//Comprobación de POST
 
 //Regexs
 // Regex No se admiten carácteres especiales ni números /[\d\W_]/
@@ -16,47 +15,44 @@ function sanizar_input($datos)
     $datos = htmlspecialchars($datos);
     return $datos;
 }
-function datos_registro($nombre, $apellidos, $email, $fecha, $hashedPasssword)
+function datos_registro($nombre, $apellidos, $email, $fecha, $password, $nombreImagen)
 {
-    $datos2 = array(
-        "nombre" => $nombre,
-        "apellidos" => $apellidos,
-        "email" => $email,
-        "fecha" => $fecha,
-        "hashedPasssword" => password_hash($hashedPasssword, PASSWORD_DEFAULT),
-        "imagen" => $_FILES['imagen']['name']
-    );
-    return $datos2;
+    return [$nombre, $apellidos, $email, $fecha, password_hash($password, PASSWORD_DEFAULT), $nombreImagen];
 }
-var_dump($_FILES);
-exit();
 $nombre = sanizar_input($_POST["nombre"]);
 $apellidos = sanizar_input($_POST["apellidos"]);
 $email = sanizar_input($_POST["email"]);
 $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-$fecha = ($_POST["fecha"]);
-$password = $_POST["password"]; 
+$fechaNacimiento = $_POST['fecha'];
+$fechaNacimiento_date = new DateTime($fechaNacimiento);
+$fechaActual = new DateTime();
+$diferencia = $fechaActual->diff($fechaNacimiento_date);
+$password = $_POST["password"];
 $password_conf = $_POST["password_conf"];
-$hashedPasssword = password_hash($_POST["password"], PASSWORD_DEFAULT);
-$imagenload = false;
+
+//Comprobación sobre si el nombre y apellidos están bien escritos, las contraseñas son iguales y cumplen la expresión regular y la edad es mayor a 18
 if (
     preg_match('/[\d\W_]/', $_POST["nombre"]) || preg_match('/[\d\W_]/', $_POST["apellidos"]) ||
     !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\S]{8,20}$/', $_POST["password"]) ||
-    !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\S]{8,20}$/', $_POST["password_conf"])
+    !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\S]{8,20}$/', $_POST["password_conf"]) ||
+    $password !== $password_conf ||
+    $diferencia->y < 18 ||
+    $email == false
 ) {
-    //Si entra aquí significa que alguno de los campos no fue correcto
+    //Si entra aquí significa que alguno de los campos no fue correcto (El js mostrará detalladamente qué fue mal antes de mandar nada al servidor,
+    //Esto es una segunda capa de seguridad ya que js se puede desactivar)
     $_SESSION["error"] = "No se pudieron validar los campos correctamente. Inténtelo de nuevo";
     header("location: registro.php");
     die();
 } else {
-    //Si entra aquí significa que el formulario se validó correctamente, quedaría la imagen
+    //Si entra aquí significa que el formulario se validó correctamente, quedaría la imagen, que es opcional
     $ruta_imagenes = "../ImagenesUsuarios/";
     $nombreImagen = basename($_FILES['imagen']['name']);
     $ruta_imagenes = $ruta_imagenes . $nombreImagen;
     $imageFileType = strtolower(pathinfo($ruta_imagenes, PATHINFO_EXTENSION));
 
-    //Cambiar eta vaina y comprobar mejor
-    if (!$_FILES['imagen']['name'] == 0) {
+    //Comprobación sobre si la imagen existe, tiene tamaño válido y es de tipo válido, en el caso de que no, se usará la foto Default
+    if (!$_FILES['imagen']['name'] == 0 or "" or null) {
         $imagenload = "true";
         $imagen_size = $_FILES['imagen']["size"];
         if ($_FILES["imagen"]["size"] > 2000000) {
@@ -64,7 +60,7 @@ if (
             $imagenload = "false";
             $nombreImagen = "Default.png";
         }
-        if (!($_FILES["imagen"]["type"] == "image/jpeg" or $_FILES["imagen"]["type"] == "image/png" or $_FILES["imagen"]["type"] == "image/jpg")) {
+        if (!($_FILES["imagen"]["type"] == "image/jpeg" || $_FILES["imagen"]["type"] == "image/png" || $_FILES["imagen"]["type"] == "image/jpg")) {
             echo " Tu archivo tiene que ser JPG o PNG. Otros archivos no son permitidos<BR>";
             $imagenload = "false";
             $nombreImagen = "Default.png";
@@ -75,25 +71,26 @@ if (
                 $nombreImagen = "Default.png";
             }
         }
+    } else {
+        $nombreImagen = "Default.png";
     }
-    if ($email == false || $password !== $password_conf) {
-        //header("location: registro.php");
-    } else { 
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            // Selects
-            $stmt = read($conn, $email);
-            if ($stmt->fetch() != false) {
-                echo "Ya existe ese usuario";
-            }else{
-                //Insert
-                if (!$imagenload) {
-                    $nombreImagen = "Default.png";
-                }
-                $stmt = $conn->prepare("INSERT INTO usuarios (Nombre, Apellidos, Email, Fecha, Passw, NombreImagen) VALUES (?,?,?,?,?,?)");
-                $stmt->execute([$nombre, $apellidos, $email, $fecha, $hashedPasssword, $nombreImagen]);
-    
-                // header("location: index.php");
-                // die();
-            }
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Select para ver si el email que escribió ya existe
+    $stmt = read($conn, $email);
+    if ($stmt->fetch() != false) {
+        $_SESSION["error"] = "Ya existe un usuario con ese email";
+        header("location: registro.php");
+        die();
+    } else {
+        //Insert
+        $datos = datos_registro($nombre, $apellidos, $email, $fechaNacimiento, $password, $nombreImagen);
+        if (!create($conn, $datos)) {
+            $_SESSION["error"] = "Ocurrió un error inesperado al insertar los datos. Inténtelo de nuevo";
+            header("location: registro.php");
+            die();
+        } else {
+            header("location: index.php");
+            die();
+        }
     }
 }

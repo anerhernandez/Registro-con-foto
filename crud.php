@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 function read($conn,$email)
 {
@@ -9,6 +8,9 @@ function read($conn,$email)
     return $stmt;
 }
 
-function create() {}
+function create($conn, $datos) {
+    $stmt = $conn->prepare("INSERT INTO usuarios (Nombre, Apellidos, Email, Fecha, Passw, NombreImagen) VALUES (?,?,?,?,?,?)");
+    return $stmt->execute($datos);
+}
 
 function delete() {}
