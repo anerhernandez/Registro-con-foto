@@ -2,7 +2,7 @@
 
 function read($conn,$email)
 {
-    $stmt = $conn->prepare("SELECT Email, PassW FROM usuarios WHERE Email LIKE ?");
+    $stmt = $conn->prepare("SELECT * FROM usuarios WHERE Email LIKE ?");
     $stmt->execute([$email]);
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
     return $stmt;
@@ -13,4 +13,7 @@ function create($conn, $datos) {
     return $stmt->execute($datos);
 }
 
-function delete() {}
+function delete($conn, $email) {
+    $stmt = $conn->prepare("DELETE FROM usuarios WHERE Email LIKE ?");
+    return $stmt->execute([$email]);
+}

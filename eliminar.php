@@ -1,16 +1,20 @@
 <?php
 session_start();
-$datosJSON = file_get_contents("../../Usuarios/usuarios.json");
-$datosJSON = json_decode($datosJSON, 1);
-
-$emailSincomillas = $_SESSION["emailCliente"];
-$emailSincomillas = str_replace("\"", "", $emailSincomillas);
+require("conexion.php");
+require("crud.php");
 
 
-if (in_array(json_decode($_SESSION["emailCliente"]), $datosJSON[$emailSincomillas])) {
-    unset($datosJSON[json_decode($_SESSION["emailCliente"])]);
-    echo "Se han eliminado sus datos";
-    echo "<br><br><a href=" . "\"index.php\"" . ">Volver a inicio de sesión</a>";
+if (delete($conn, $_SESSION["datos_usuario"]["Email"])) {
+    
+    if($_SESSION["datos_usuario"]["NombreImagen"] != "Default.png"){
+        //La imagen usada es distinta la foto default, por lo tanto, se debe eliminar tambien
+        if (file_exists("../ImagenesUsuarios/" . $_SESSION["datos_usuario"]["NombreImagen"]) && unlink("../ImagenesUsuarios/" . $_SESSION["datos_usuario"]["NombreImagen"])) {
+            //Se consiguió eliminar la foto
+        }
+    }
+    
+    echo "Se ha eliminado al usuario correctamente";
 }
-
-file_put_contents("../../Usuarios/usuarios.json", json_encode($datosJSON, JSON_PRETTY_PRINT));
+session_destroy();
+echo "<br><br><a href=' . 'index.php' . '>Volver a inicio de sesión</a>";
+?>

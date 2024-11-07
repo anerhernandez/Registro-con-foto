@@ -26,8 +26,10 @@ require("crud.php");
             if ($resultado == false) {
                 $_SESSION["error"] = "No existe un usuario con ese email";
                 //Verificar que la contraseña escrita se verifica con el hash guardado en la DB
-            }elseif (password_verify($_POST['password'], $resultado["PassW"])) {
-                echo "Los datos son correctos yahooo " . print_r($resultado);
+            }elseif (password_verify($_POST['password'], $resultado["Passw"])) {
+                $_SESSION["datos_usuario"] = $resultado;
+                header("location: muestra.php");
+                die();
             }else{
                 echo "La contraseña no está bien escrita";
             } 

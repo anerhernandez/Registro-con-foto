@@ -42,8 +42,7 @@ require("conexion.php");
         </div>
         <input type="submit" name="submit" id="enviar" value="Enviar"><br><br>
     </form>
-<!--
-    
+
     <script>
         let formulario = document.getElementById("formulario");
         document.getElementById("enviar").addEventListener('click', (event) => {
@@ -83,7 +82,7 @@ require("conexion.php");
                     apellidoform = 1;
                 }
             }
-
+            
             if (formulario["password"].value == "") {
                 document.getElementById("error_pass").innerHTML = "Rellene el campo";
                 document.getElementById("error_pass").style.color = "red";
@@ -142,7 +141,7 @@ require("conexion.php");
             }
         })
     </script>
--->
+
     <p>¿Ya tienes cuenta?</p>
     <a href="index.php">Inicia sesión aquí</a>
 </body>
