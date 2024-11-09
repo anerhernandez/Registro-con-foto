@@ -42,7 +42,6 @@ require("conexion.php");
         </div>
         <input type="submit" name="submit" id="enviar" value="Enviar"><br><br>
     </form>
-
     <script>
         let formulario = document.getElementById("formulario");
         document.getElementById("enviar").addEventListener('click', (event) => {
@@ -52,6 +51,7 @@ require("conexion.php");
             let passwform = 0;
             let passwConfform = 0;
             let samePassform = 0;
+            let fechaform = 0;
 
             if (formulario["nombre"].value == "") {
                 document.getElementById("error_nombre").innerHTML = "Rellene el campo";
@@ -61,7 +61,7 @@ require("conexion.php");
                     document.getElementById("error_nombre").innerHTML = "No se admiten números ni nombres compuestos";
                     document.getElementById("error_nombre").style.color = "red";
                 } else {
-                    document.getElementById("error_nombre").innerHTML = "Sa validado el campo";
+                    document.getElementById("error_nombre").innerHTML = "Se ha validado el campo";
                     document.getElementById("error_nombre").style.color = "green";
                     nombreform = 1;
                 }
@@ -77,12 +77,26 @@ require("conexion.php");
                     document.getElementById("error_apellido").innerHTML = "No se admiten números ni nombres compuestos";
                     document.getElementById("error_apellido").style.color = "red";
                 } else {
-                    document.getElementById("error_apellido").innerHTML = "Sa validado el campo";
+                    document.getElementById("error_apellido").innerHTML = "Se ha validado el campo";
                     document.getElementById("error_apellido").style.color = "green";
                     apellidoform = 1;
                 }
             }
-            
+
+            if (formulario["fecha"].value == "") {
+                document.getElementById("error_fecha").innerHTML = "Rellene el campo";
+                document.getElementById("error_fecha").style.color = "red";
+            } else {
+                if ((new Date().getFullYear() - new Date(formulario["fecha"].value).getFullYear()) < 19) {
+                    document.getElementById("error_fecha").innerHTML = "Tiene que escribir una fecha con mayoría de edad";
+                    document.getElementById("error_fecha").style.color = "red";
+                } else {
+                    document.getElementById("error_fecha").innerHTML = "Se ha validado el campo";
+                    document.getElementById("error_fecha").style.color = "green";
+                    fechaform = 1;
+                }
+            }
+
             if (formulario["password"].value == "") {
                 document.getElementById("error_pass").innerHTML = "Rellene el campo";
                 document.getElementById("error_pass").style.color = "red";
@@ -91,7 +105,7 @@ require("conexion.php");
                     document.getElementById("error_pass").innerHTML = "Se deben validar primero los campos";
                     document.getElementById("error_pass").style.color = "red";
                 } else {
-                    document.getElementById("error_pass").innerHTML = "Sa validado el campo";
+                    document.getElementById("error_pass").innerHTML = "Se ha validado el campo";
                     document.getElementById("error_pass").style.color = "green";
                     passwform = 1;
                 }
@@ -106,7 +120,7 @@ require("conexion.php");
                     document.getElementById("error_pass_conf").innerHTML = "Se deben validar primero los campos";
                     document.getElementById("error_pass_conf").style.color = "red";
                 } else {
-                    document.getElementById("error_pass_conf").innerHTML = "Sa validado el campo";
+                    document.getElementById("error_pass_conf").innerHTML = "Se ha validado el campo";
                     document.getElementById("error_pass_conf").style.color = "green";
                     passwConfform = 1;
                 }
@@ -133,11 +147,10 @@ require("conexion.php");
                     samePassform = 0;
                 }
             }
-            if (nombreform == 1 && apellidoform == 1 && passwform == 1 && passwConfform == 1 && samePassform == 1) {
+            if (nombreform == 1 && apellidoform == 1 && passwform == 1 && passwConfform == 1 && samePassform == 1 && fechaform == 1) {
                 location.href = "logica.php";
             } else {
-                event.preventDefault();
-                
+                event.preventDefault() 
             }
         })
     </script>

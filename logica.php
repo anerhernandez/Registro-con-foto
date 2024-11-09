@@ -56,19 +56,22 @@ if (
         $imagenload = "true";
         $imagen_size = $_FILES['imagen']["size"];
         if ($_FILES["imagen"]["size"] > 2000000) {
-            echo "El archivo es mayor que 200KB, debes reduzcirlo antes de subirlo<BR>";
+            $_SESSION["error"] = "El archivo es mayor que 200KB, debes reducirlo antes de subirlo<br>";
             $imagenload = "false";
-            $nombreImagen = "Default.png";
+            header("location: registro.php");
+            die();
         }
         if (!($_FILES["imagen"]["type"] == "image/jpeg" || $_FILES["imagen"]["type"] == "image/png" || $_FILES["imagen"]["type"] == "image/jpg")) {
-            echo " Tu archivo tiene que ser JPG o PNG. Otros archivos no son permitidos<BR>";
+            $_SESSION["error"] = " Tu archivo tiene que ser JPG o PNG. Otros archivos no son permitidos<br>";
             $imagenload = "false";
-            $nombreImagen = "Default.png";
+            header("location: registro.php");
+            die();
         }
         if ($imagenload == "true") {
             if (!move_uploaded_file($_FILES["imagen"]["tmp_name"], $ruta_imagenes)) {
-                echo "Error al subir el archivo";
-                $nombreImagen = "Default.png";
+                $_SESSION["error"] = "Error al subir el archivo <br>";
+                header("location: registro.php");
+                die();
             }
         }
     } else {
